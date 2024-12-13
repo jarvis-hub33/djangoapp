@@ -1,0 +1,25 @@
+{% extends "appWeb/base.html" %}
+
+{% block contenido %}
+<div class="container mt-4">
+    <h1 class="text-center">Agendar Hora</h1>
+    <h5 class="text-center">Hora: {{ hora.hora }} - Especialidad: {{ hora.get_especialidad_display }}</h5>
+
+    <form method="post"> <!-- Aseguramos el método POST -->
+        {% csrf_token %} <!-- Token CSRF obligatorio -->
+        <div class="mb-3">
+            {{ form.nombre.label_tag }}
+            {{ form.nombre }}
+        </div>
+        <div class="mb-3">
+            {{ form.edad.label_tag }}
+            {{ form.edad }}
+        </div>
+        <div class="mb-3">
+            {{ form.problema.label_tag }}
+            {{ form.problema }}
+        </div>
+        <button type="submit" class="btn btn-primary">Agendar</button> <!-- Botón para enviar el formulario -->
+    </form>
+</div>
+{% endblock contenido %}

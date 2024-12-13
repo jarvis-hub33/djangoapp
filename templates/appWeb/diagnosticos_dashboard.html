@@ -1,0 +1,177 @@
+{% extends "appWeb/base.html" %}
+
+{% block contenido %}
+<div class="container mt-4">
+    <h1 class="text-center text-primary fw-bold">VitalCheck - Bienvenido Doctor(a)</h1>
+
+    <!-- Mensajes de alerta -->
+    {% if messages %}
+    <div class="mt-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="row mt-4">
+        <!-- Panel de Selección de Cliente -->
+        <div class="col-md-12">
+            <form method="get" class="d-flex align-items-center">
+                <label for="paciente" class="form-label me-2 fw-bold">Seleccionar Paciente:</label>
+                <select name="paciente_id" id="paciente" class="form-select me-2" style="width: auto;">
+                    {% for paciente in pacientes %}
+                    <option value="{{ paciente.id }}" {% if selected_paciente and selected_paciente.id == paciente.id %}selected{% endif %}>
+                        {{ paciente.nombre }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-primary">Ver Diagnósticos</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <!-- Formulario para Cargar Archivo -->
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white fw-bold">
+                    Cargar Archivo Excel
+                </div>
+                <div class="card-body">
+                    <form id="uploadForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="fileInput" class="form-label">Selecciona un archivo Excel</label>
+                            <input type="file" id="fileInput" name="file" class="form-control" accept=".xlsx, .xls" required>
+                        </div>
+                        <button type="button" class="btn btn-success w-100" id="analyzeButton" disabled>Realizar Análisis Predictivo</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Diagnósticos del Cliente -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white fw-bold">
+                    Diagnósticos del Cliente
+                </div>
+                <div class="card-body">
+                    <canvas id="graficoDiagnosticos"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resultado del análisis -->
+    <div id="analysisResult" class="mt-4" style="display: none;">
+        <h3 class="text-center fw-bold text-info">Resultados del Análisis Predictivo</h3>
+        <p class="text-center">El análisis predictivo muestra el porcentaje de riesgo de desarrollar enfermedades basado en los datos cargados.</p>
+        <div id="resumen" class="mb-3"></div>
+        <canvas id="predictionChart" width="400" height="200"></canvas>
+
+        <!-- Detalles del análisis -->
+        <div id="detalles" class="mt-4">
+            <h4 class="fw-bold">Detalles del Análisis</h4>
+            <table class="table table-bordered table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Enfermedad</th>
+                        <th>Especialidad</th>
+                        <th>Tipo de Atención</th>
+                        <th>Meses Predichos</th>
+                        <th>Recomendaciones</th>
+                        <th>Consecuencias</th>
+                    </tr>
+                </thead>
+                <tbody id="detallesBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const analyzeButton = document.getElementById('analyzeButton');
+    const fileInput = document.getElementById('fileInput');
+
+    fileInput.addEventListener('change', function () {
+        analyzeButton.disabled = !fileInput.files.length;
+    });
+
+    analyzeButton.addEventListener('click', function () {
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        fetch('/analizar_excel/', {
+            method: 'POST',
+            body: formData,
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    mostrarResultados(data);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al procesar el archivo.');
+            });
+    });
+
+    function mostrarResultados(data) {
+        document.getElementById('analysisResult').style.display = 'block';
+
+        // Resumen del análisis
+        const resumenDiv = document.getElementById('resumen');
+        resumenDiv.innerHTML = `
+            <p><strong>Resumen:</strong></p>
+            <ul>
+                <li>Leve: ${data.detalles.filter(d => d['Tipo de Atención'].toLowerCase() === 'leve').length}</li>
+                <li>Moderada: ${data.detalles.filter(d => d['Tipo de Atención'].toLowerCase() === 'moderada').length}</li>
+                <li>Grave: ${data.detalles.filter(d => d['Tipo de Atención'].toLowerCase() === 'grave').length}</li>
+            </ul>
+        `;
+
+        // Detalles del análisis
+        const detallesBody = document.getElementById('detallesBody');
+        detallesBody.innerHTML = '';
+        data.detalles.forEach(detalle => {
+            detallesBody.innerHTML += `
+                <tr>
+                    <td>${detalle.Enfermedad}</td>
+                    <td>${detalle.Especialidad}</td>
+                    <td>${detalle['Tipo de Atención']}</td>
+                    <td>${detalle.Meses} meses</td>
+                    <td>${detalle.Recomendaciones}</td>
+                    <td>${detalle.Consecuencias}</td>
+                </tr>
+            `;
+        });
+
+        // Gráfico de predicciones
+        const ctx = document.getElementById('predictionChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Leve', 'Moderada', 'Grave'],
+                datasets: [{
+                    label: 'Cantidad de Pacientes',
+                    data: [
+                        data.detalles.filter(d => d['Tipo de Atención'].toLowerCase() === 'leve').length,
+                        data.detalles.filter(d => d['Tipo de Atención'].toLowerCase() === 'moderada').length,
+                        data.detalles.filter(d => d['Tipo de Atención'].toLowerCase() === 'grave').length
+                    ],
+                    backgroundColor: ['#28a745', '#ffa500', '#ff0000'],
+                }]
+            }
+        });
+    }
+</script>
+{% endblock contenido %}

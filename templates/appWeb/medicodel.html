@@ -1,0 +1,26 @@
+{% extends "appWeb/base.html" %}
+{% load static %}
+
+{% block contenido %}
+
+<div class="rol">
+    <div class="col">
+        <h2>Confirmar Eliminación de Médico</h2>
+        <div class="alert alert-danger">
+            ¿Está seguro de eliminar al médico {{ medico.nombre }}?
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col">
+                    <a class="btn btn-dark" href="{% url 'medicos' %}">Cancelar</a>
+                </div>
+                <div class="col">
+                    <button class="btn btn-danger" type="submit">Confirmar Eliminar</button>   
+                </div>
+            </div> 
+        </form>
+    </div>
+</div>
+
+{% endblock contenido %}

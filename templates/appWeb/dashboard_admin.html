@@ -1,0 +1,35 @@
+{% extends "appWeb/base.html" %}
+
+{% block contenido %}
+<div class="container">
+    <h1>Bienvenido al Dashboard de Administrador</h1>
+    <p>Gestiona el sistema aquí.</p>
+
+    <div id="calendar"></div>
+</div>
+
+<!-- Importar FullCalendar -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+
+        // Aseguramos que eventos sea tratado como JSON válido
+        var eventos = JSON.parse('{{ eventos|escapejs }}');
+
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'es', // Configuración para idioma español
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            events: eventos // Pasamos los eventos al calendario
+        });
+
+        calendar.render();
+    });
+</script>
+{% endblock contenido %}

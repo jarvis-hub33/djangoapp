@@ -1,0 +1,45 @@
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Nombre</th>
+            <th>RUN</th>
+            <th>Sexo</th>
+            <th>Especialidad</th>
+            <th>Tipo de Atención</th>
+            <th>Foto</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for medico in medicos %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ medico.nombre }}</td>
+            <td>{{ medico.run }}</td>
+            <td>{{ medico.sexo }}</td>
+            <td>{{ medico.especialidad }}</td>
+            <td>{{ medico.tipo_atencion }}</td>
+            <td>
+                {% if medico.foto %}
+                    <img src="{{ medico.foto.url }}" alt="Foto del médico" class="img-thumbnail" width="50" height="auto">
+                {% else %}
+                    <span class="text-muted">No disponible</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if user.is_authenticated %}
+                    {% if user.is_superuser %}
+                        <a class="btn btn-warning btn-sm" href="{% url 'medicoeditar' medico.id %}"><i class="bi bi-pencil-square"></i> Editar</a>
+                        <a class="btn btn-danger btn-sm" href="{% url 'eliminarmedico' medico.id %}"><i class="bi bi-trash3-fill"></i> Eliminar</a>
+                    {% endif %}
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="8" class="text-center">No se encontraron médicos</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

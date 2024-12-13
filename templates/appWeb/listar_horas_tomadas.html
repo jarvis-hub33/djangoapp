@@ -1,0 +1,225 @@
+{% extends "appWeb/base.html" %}
+
+{% block contenido %}
+<div class="row mb-3 align-items-center">
+    <!-- Botón de agregar hora tomada -->
+    <div class="col-md-4">
+        <a class="btn btn-primary btn-lg" href="{% url 'agregar_hora_tomada' %}">
+            <i class="bi bi-calendar-plus"></i> Agregar Hora
+        </a>
+    </div>
+
+    <!-- Módulo de búsqueda por Ajax -->
+    <div class="col-lg-5">
+        <form id="searchForm" class="d-flex" method="GET" action="{% url 'buscar_horas_tomadas' %}">
+            <input id="searchInput" class="form-control me-2" type="search" name="q" placeholder="Buscar por nombre, médico o especialidad" aria-label="Search">
+            <button class="btn btn-outline-info" type="submit">Buscar</button>
+        </form>
+    </div>
+
+    <!-- Botones de acciones principales alineados a la derecha -->
+    <div class="col-md-3 text-end">
+        <div class="btn-group">
+            <button class="btn btn-warning btn-lg" id="editarSeleccionados">
+                <i class="bi bi-pencil-square"></i> Editar
+            </button>
+            <button class="btn btn-danger btn-lg" id="eliminarSeleccionados">
+                <i class="bi bi-trash-fill"></i> Eliminar
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <form id="formAcciones" method="POST">
+            {% csrf_token %}
+            <table class="table table-striped mt-4 black-table">
+                <thead>
+                    <tr>
+                        <th>
+                            <input type="checkbox" id="selectAll">
+                        </th>
+                        <th>Paciente</th>
+                        <th>Apellido Paterno</th>
+                        <th>Apellido Materno</th>
+                        <th>Sexo</th>
+                        <th>Enfermedad</th>
+                        <th>Fecha de hora</th>
+                        <th>Médico</th>
+                        <th>Especialidad</th>
+                        <th>Lugar de Atención</th>
+                    </tr>
+                </thead>
+                <tbody id="horasBody">
+                    {% if horas %}
+                        {% for hora in horas %}
+                        <tr>
+                            <td>
+                                <input type="checkbox" class="horaCheckbox" name="horasSeleccionadas" value="{{ hora.id }}">
+                            </td>
+                            <td>{{ hora.nombre }}</td>
+                            <td>{{ hora.paterno }}</td>
+                            <td>{{ hora.materno }}</td>
+                            <td>{{ hora.sexo }}</td>
+                            <td>{{ hora.enfermedad }}</td>
+                            <td>{{ hora.fecha_nacimiento|date:"d-m-Y" }}</td>
+                            <td>{{ hora.medico }}</td>
+                            <td>{{ hora.especialidad }}</td>
+                            <td>{{ hora.lugar_de_atencion }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="10" class="text-center text-warning">No hay horas tomadas registradas.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+            <div class="text-center">
+                <button class="btn btn-primary" id="prevPage" disabled>⮜ Anterior</button>
+                <button class="btn btn-primary" id="nextPage">Siguiente ⮞</button>
+                <div class="mt-3" id="pageNumber">Página 1</div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Estilos adicionales -->
+<style>
+    .btn-lg {
+        font-size: 16px;
+        padding: 5px 12px;
+    }
+
+    .row.mb-3 {
+        align-items: center;
+    }
+
+    #searchInput {
+        font-size: 16px;
+    }
+
+    .btn-group .btn {
+        margin-right: 8px;
+    }
+
+    /* Estilos para la tabla con fondo negro y texto blanco */
+    .black-table {
+        background-color:  rgb(27, 129, 197);
+    }
+
+    .black-table th,
+    .black-table td {
+        color: white;
+    }
+
+    .table th:first-child,
+    .table td:first-child {
+        text-align: center;
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
+
+    #pageNumber {
+        font-weight: bold;
+        font-size: 18px;
+    }
+</style>
+
+<!-- JavaScript -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const selectAllCheckbox = document.getElementById("selectAll");
+        const horaCheckboxes = document.querySelectorAll(".horaCheckbox");
+        const horasBody = document.getElementById("horasBody");
+        const prevPageBtn = document.getElementById("prevPage");
+        const nextPageBtn = document.getElementById("nextPage");
+        const pageNumberElement = document.getElementById("pageNumber");
+
+        let currentPage = 1;
+        const pageSize = 10;
+        const horas = Array.from(horasBody.querySelectorAll("tr"));
+
+        // Renderizar la página inicial
+        function renderPage(page) {
+            const startIndex = (page - 1) * pageSize;
+            const endIndex = startIndex + pageSize;
+
+            horas.forEach((hora, index) => {
+                if (index >= startIndex && index < endIndex) {
+                    hora.style.display = "";
+                } else {
+                    hora.style.display = "none";
+                }
+            });
+
+            prevPageBtn.disabled = page === 1;
+            nextPageBtn.disabled = endIndex >= horas.length;
+            pageNumberElement.textContent = `Página ${page}`;
+        }
+
+        // Botones de navegación
+        prevPageBtn.addEventListener("click", function () {
+            if (currentPage > 1) {
+                currentPage--;
+                renderPage(currentPage);
+            }
+        });
+
+        nextPageBtn.addEventListener("click", function () {
+            if (currentPage * pageSize < horas.length) {
+                currentPage++;
+                renderPage(currentPage);
+            }
+        });
+
+        // Seleccionar o deseleccionar todos los checkboxes
+        selectAllCheckbox.addEventListener("change", function () {
+            horaCheckboxes.forEach((checkbox) => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+        });
+
+        // Obtener IDs seleccionados
+        function getSeleccionados() {
+            return Array.from(horaCheckboxes)
+                .filter((checkbox) => checkbox.checked)
+                .map((checkbox) => checkbox.value);
+        }
+
+        // Editar seleccionados
+        document.getElementById("editarSeleccionados").addEventListener("click", function () {
+            const seleccionados = getSeleccionados();
+            if (seleccionados.length === 1) {
+                const id = seleccionados[0];
+                const editarUrl = "{% url 'editar_hora_tomada' 0 %}".replace('0', id);
+                window.location.href = editarUrl;
+            } else if (seleccionados.length > 1) {
+                alert("Solo puedes editar una hora a la vez.");
+            } else {
+                alert("Por favor selecciona una hora para editar.");
+            }
+        });
+
+        // Eliminar seleccionados
+        document.getElementById("eliminarSeleccionados").addEventListener("click", function () {
+            const seleccionados = getSeleccionados();
+            if (seleccionados.length > 0) {
+                const ids = seleccionados.join(",");
+                const eliminarUrl = "{% url 'eliminar_hora_tomada' 0 %}".replace('0', ids);
+                if (confirm("¿Estás seguro de que deseas eliminar las horas seleccionadas?")) {
+                    window.location.href = eliminarUrl;
+                }
+            } else {
+                alert("Por favor selecciona al menos una hora para eliminar.");
+            }
+        });
+
+        // Renderizar la primera página
+        renderPage(currentPage);
+    });
+</script>
+{% endblock contenido %}

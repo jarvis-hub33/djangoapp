@@ -1,0 +1,75 @@
+{% extends "appWeb/base.html" %}
+{% load static %}
+
+{% block contenido %}
+
+<form method="post">
+    {% csrf_token %}
+    <div class="row">
+        <h2 class="mb-4">Mantenedor de Horas Tomadas</h2>
+        <div class="col-9">
+            <div class="row">
+                <div class="col-4 mb-3">
+                    {{ form.nombre.label_tag }}
+                    {{ form.nombre }}
+                    {{ form.nombre.errors }}
+                </div>
+                <div class="col-4 mb-3">
+                    {{ form.paterno.label_tag }}
+                    {{ form.paterno }}
+                    {{ form.paterno.errors }}
+                </div>
+                <div class="col-4 mb-3">
+                    {{ form.materno.label_tag }}
+                    {{ form.materno }}
+                    {{ form.materno.errors }}
+                </div>
+                <div class="col-4 mb-3">
+                    {{ form.sexo.label_tag }}
+                    {{ form.sexo }}
+                    {{ form.sexo.errors }}
+                </div>
+                <div class="col-4 mb-3">
+                    {{ form.enfermedad.label_tag }}
+                    {{ form.enfermedad }}
+                    {{ form.enfermedad.errors }}
+                </div>
+                <div class="col-4 mb-3">
+                    {{ form.fecha_nacimiento.label_tag }}
+                    {{ form.fecha_nacimiento }}
+                    {{ form.fecha_nacimiento.errors }}
+                </div>
+                <div class="col-4 mb-3">
+                    {{ form.medico.label_tag }}
+                    {{ form.medico }}
+                    {{ form.medico.errors }}
+                </div>
+                <div class="col-4 mb-3">
+                    {{ form.especialidad.label_tag }}
+                    {{ form.especialidad }}
+                    {{ form.especialidad.errors }}
+                </div>
+                <div class="col-4 mb-3">
+                    {{ form.lugar_de_atencion.label_tag }}
+                    {{ form.lugar_de_atencion }}
+                    {{ form.lugar_de_atencion.errors }}
+                </div>
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="row">
+               
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col">
+                <a class="btn btn-primary btn-block" href="{% url 'listar_horas_tomadas' %}">IR AL INICIO</a>
+            </div>
+            <div class="col">
+                <button class="btn btn-success btn-block" type="submit">GUARDAR</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+{% endblock contenido %}

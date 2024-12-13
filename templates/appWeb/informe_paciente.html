@@ -1,0 +1,58 @@
+{% extends "appWeb/base.html" %}
+
+{% block contenido %}
+<div class="container mt-4">
+    <h1 class="text-center text-primary">Informe del Paciente</h1>
+
+    <!-- Botones para descargar -->
+    <div class="text-center mb-4">
+        <a href="{% url 'informe_excel' paciente.id %}" class="btn btn-success">Descargar Informe en Excel</a>
+        <a href="{% url 'informe_pdf' paciente.id %}" class="btn" style="background-color: #FF7F00; color: white; margin-left: 10px;">Descargar Informe en PDF</a>
+    </div>
+
+    <!-- Datos del paciente -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card p-3">
+                <h4><strong>RUN:</strong></h4>
+                <p>{{ paciente.run }}</p>
+                <h4><strong>Nombre del Paciente:</strong></h4>
+                <p>{{ paciente.nombre }}</p>
+                <h4><strong>Apellido Paterno:</strong></h4>
+                <p>{{ paciente.paterno }}</p>
+                <h4><strong>Apellido Materno:</strong></h4>
+                <p>{{ paciente.materno }}</p>
+                <h4><strong>Sexo:</strong></h4>
+                <p>{{ paciente.sexo }}</p>
+                <h4><strong>Enfermedad:</strong></h4>
+                <p>{{ paciente.enfermedad }}</p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card p-3">
+                <h4><strong>Fecha de Nacimiento:</strong></h4>
+                <p>{{ paciente.fechaNac|date:"d/m/Y" }}</p>
+                <h4><strong>Tipo de Atención:</strong></h4>
+                <p>{{ paciente.tipoatencion }}</p>
+                <h4><strong>Especialidad:</strong></h4>
+                <p>{{ paciente.especialidad }}</p>
+                <h4><strong>Fotografía:</strong></h4>
+                <p>
+                    {% if paciente.foto %}
+                    <img src="{{ paciente.foto.url }}" alt="foto del paciente" width="100" height="100">
+                    {% else %}
+                    Sin Foto
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botón de Volver a la página de Pacientes -->
+    <div class="text-center mb-4">
+        <a href="{% url 'pacientes' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver a Pacientes
+        </a>
+    </div>
+</div>
+{% endblock contenido %}

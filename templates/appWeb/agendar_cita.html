@@ -1,0 +1,17 @@
+{% extends "appWeb/base.html" %}
+
+{% block contenido %}
+<div class="container mt-4">
+    <h1 class="text-center">Agendar Cita</h1>
+    <h4>Hora seleccionada: {{ hora.hora }}</h4>
+    <h4>Especialidad: {{ hora.get_especialidad_display }}</h4>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Agendar</button>
+    </form>
+</div>
+{% endblock contenido %}
+
+

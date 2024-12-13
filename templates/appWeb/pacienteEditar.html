@@ -1,0 +1,133 @@
+{% extends "appWeb/base.html" %}
+{% load static %}
+
+{% block contenido %}
+<div class="row">
+    <div class="col">
+        <div class="nav-bar">
+            <h2>Editar Paciente</h2>
+        </div>
+        <form method="post" action="{% url 'pacienteEditado' paciente.id %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+                <!-- RUN -->
+                <div class="col-3 mb-3">
+                    {{ form.run.label_tag }}
+                    {{ form.run }}
+                    {{ form.run.errors }}
+                </div>
+
+                <!-- Nombre -->
+                <div class="col-3 mb-3">
+                    {{ form.nombre.label_tag }}
+                    {{ form.nombre }}
+                    {{ form.nombre.errors }}
+                </div>
+
+                <!-- Apellido Paterno -->
+                <div class="col-3 mb-3">
+                    {{ form.paterno.label_tag }}
+                    {{ form.paterno }}
+                    {{ form.paterno.errors }}
+                </div>
+
+                <!-- Apellido Materno -->
+                <div class="col-3 mb-3">
+                    {{ form.materno.label_tag }}
+                    {{ form.materno }}
+                    {{ form.materno.errors }}
+                </div>
+
+                <!-- Sexo -->
+                <div class="col-3 mb-3">
+                    {{ form.sexo.label_tag }}
+                    {{ form.sexo }}
+                    {{ form.sexo.errors }}
+                </div>
+
+                <!-- Enfermedad -->
+                <div class="col-3 mb-3">
+                    {{ form.enfermedad.label_tag }}
+                    {{ form.enfermedad }}
+                    {{ form.enfermedad.errors }}
+                </div>
+
+                <!-- Fecha de Nacimiento -->
+                <div class="col-3 mb-3">
+                    <label for="id_fechaNac">Fecha de Nacimiento</label>
+                    <input type="date" class="form-control" name="fechaNac" value="{{ form.fechaNac.value|date:'Y-m-d' }}">
+                    {{ form.fechaNac.errors }}
+                </div>
+
+                <!-- Tipo de Atención -->
+                <div class="col-3 mb-3">
+                    {{ form.tipoatencion.label_tag }}
+                    {{ form.tipoatencion }}
+                    {{ form.tipoatencion.errors }}
+                </div>
+
+                <!-- Especialidad -->
+                <div class="col-3 mb-3">
+                    {{ form.especialidad.label_tag }}
+                    {{ form.especialidad }}
+                    {{ form.especialidad.errors }}
+                </div>
+
+                <!-- Fotografía -->
+                <div class="col-12 mb-3 d-flex flex-column align-items-center">
+                    <label for="foto" style="font-size: 18px; font-weight: bold;">Fotografía del Paciente</label>
+                    {% if paciente.foto %}
+                        <img id="fotoPreview" src="{{ paciente.foto.url }}" alt="foto del paciente" style="width: 250px; height: auto; margin-bottom: 15px;">
+                    {% else %}
+                        <img id="fotoPreview" src="{% static 'images/paciente.png' %}" alt="Sin foto" style="width: 250px; height: auto; margin-bottom: 15px;">
+                    {% endif %}
+                    <input type="file" name="foto" class="form-control" id="fotoInput" onchange="previewImage(event)" style="width: 250px; padding: 10px; font-size: 16px;">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <a class="btn btn-primary" href="{% url 'pacientes' %}">Volver a la Lista</a>
+                </div>
+                <div class="col">
+                    <button class="btn btn-warning" type="submit">Modificar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    #fotoInput {
+        text-align: center; /* Centra el texto del botón */
+        border-radius: 5px; /* Bordes redondeados */
+    }
+
+    .d-flex {
+        justify-content: center; /* Centra los elementos horizontalmente */
+        align-items: center; /* Centra los elementos verticalmente */
+    }
+</style>
+
+<script>
+    function previewImage(event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        const preview = document.getElementById('fotoPreview');
+        const input = document.getElementById('fotoInput');
+
+        reader.onload = function() {
+            preview.src = reader.result;
+            preview.onload = function() {
+                // Ajusta el tamaño del input al tamaño de la imagen
+                input.style.width = preview.offsetWidth + 'px';
+            };
+        }
+
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+    }
+</script>
+
+{% endblock contenido %}

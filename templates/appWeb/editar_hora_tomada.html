@@ -1,0 +1,70 @@
+{% extends "appWeb/base.html" %}
+{% load static %}
+
+{% block contenido %}
+<div class="row">
+    <div class="col">
+        <div class="nav-bar">
+            <h2 class="mb-4">Editar Hora Tomada</h2>
+        </div>
+        <form method="post" action="{% url 'editar_hora_tomada' hora.id %}">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-4 mb-3">
+                    <label for="id_nombre">Nombre</label>
+                    {{ form.nombre }}
+                    <span class="text-danger">{{ form.nombre.errors }}</span>
+                </div>
+                <div class="col-4 mb-3">
+                    <label for="id_paterno">Apellido Paterno</label>
+                    {{ form.paterno }}
+                    <span class="text-danger">{{ form.paterno.errors }}</span>
+                </div>
+                <div class="col-4 mb-3">
+                    <label for="id_materno">Apellido Materno</label>
+                    {{ form.materno }}
+                    <span class="text-danger">{{ form.materno.errors }}</span>
+                </div>
+                <div class="col-4 mb-3">
+                    <label for="id_sexo">Sexo</label>
+                    {{ form.sexo }}
+                    <span class="text-danger">{{ form.sexo.errors }}</span>
+                </div>
+                <div class="col-4 mb-3">
+                    <label for="id_enfermedad">Enfermedad</label>
+                    {{ form.enfermedad }}
+                    <span class="text-danger">{{ form.enfermedad.errors }}</span>
+                </div>
+                <div class="col-4 mb-3">
+                    <label for="id_fecha_nacimiento">Fecha de Nacimiento</label>
+                    <input type="date" class="form-control" name="fecha_nacimiento" id="id_fecha_nacimiento" value="{{ form.fecha_nacimiento.value|date:'Y-m-d' }}">
+                    <span class="text-danger">{{ form.fecha_nacimiento.errors }}</span>
+                </div>
+                <div class="col-4 mb-3">
+                    <label for="id_medico">Médico</label>
+                    {{ form.medico }}
+                    <span class="text-danger">{{ form.medico.errors }}</span>
+                </div>
+                <div class="col-4 mb-3">
+                    <label for="id_especialidad">Especialidad</label>
+                    {{ form.especialidad }}
+                    <span class="text-danger">{{ form.especialidad.errors }}</span>
+                </div>
+                <div class="col-4 mb-3">
+                    <label for="id_lugar_de_atencion">Lugar de Atención</label>
+                    {{ form.lugar_de_atencion }}
+                    <span class="text-danger">{{ form.lugar_de_atencion.errors }}</span>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col">
+                    <a class="btn btn-primary btn-block" href="{% url 'listar_horas_tomadas' %}">Volver a la Lista</a>
+                </div>
+                <div class="col">
+                    <button class="btn btn-warning btn-block" type="submit">Guardar Cambios</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock contenido %}

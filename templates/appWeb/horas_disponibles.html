@@ -1,0 +1,25 @@
+{% extends "appWeb/base.html" %}
+
+{% block contenido %}
+<div class="container mt-4">
+    <h1 class="text-center">Horas Disponibles</h1>
+
+    {% for especialidad, horas in especialidades.items %}
+    <div class="mt-4">
+        <h3>{{ especialidad|capfirst }}</h3>
+        <ul class="list-group">
+            {% for hora in horas %}
+            <li id="hora-{{ hora.id }}" class="list-group-item d-flex justify-content-between align-items-center">
+                {{ hora.hora }}
+                {% if hora.disponible %}
+                    <a href="{% url 'agendar_hora' hora.id %}" class="btn btn-primary btn-sm">Agendar</a>
+                {% else %}
+                    <span class="badge bg-danger">No disponible</span>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endfor %}
+</div>
+{% endblock contenido %}

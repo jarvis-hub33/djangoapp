@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- INICIO DEL MENU-->
+        {% block menu %}
+        <div class="row">
+            <div class="col">
+                <nav class="navbar navbar-expand-lg bg-primary">
+                    <div class="container-fluid">
+                        <a class="navbar-brand" href="{% url 'inicio' %}" style="color: white;">Los Pacientes</a>
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                                <li class="nav-item">
+                                    <a class="nav-link {% if request.resolver_match.url_name == 'inicio' %}active{% endif %}" aria-current="page" href="{% url 'inicio' %}" style="color: white;">Inicio</a>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle 
+                                    {% if request.resolver_match.url_name == 'pacientes' or request.resolver_match.url_name == 'diagnosticos_dashboard' %}active{% endif %}" 
+                                    href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: white;">
+                                        Mantenedores
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="{% url 'pacientes' %}">Pacientes</a></li>
+                                        <li><a class="dropdown-item" href="#">Especialidades</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'diagnosticos_dashboard' %}">Diagnósticos</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'listar_horas_tomadas' %}">Horas Tomadas</a></li>
+                                    </ul>
+                                </li>
+                                
+                                <li class="nav-item">
+                                    <a class="nav-link {% if request.resolver_match.url_name == 'horas_disponibles' %}active{% endif %}" href="{% url 'horas_disponibles' %}" style="color: white;">Gestión de Horas</a>
+                                </li>
+                                {% if user.is_authenticated %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#" style="color: white;">Usuario: <b>{{ user.username }}</b></a>
+                                </li>
+                                <li class="nav-item">
+                                    <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-link nav-link text-warning" style="color: white; text-decoration: none;">Cerrar Sesión</button>
+                                    </form>
+                                </li>
+                                {% else %}
+                                <li class="nav-item">
+                                    <!a class="nav-link text-warning" href="{% url 'login' %}">Iniciar Sesión</a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+        {% endblock menu %}
+        <!-- FIN DEL MENU-->
+
+        <!-- INICIO DEL CONTENIDO-->
+        {% block contenido %}
+        {% endblock contenido %}
+        <!-- FIN DEL CONTENIDO-->
+
+        <!-- INICIO DEL FOOTER-->
+        {% block footer %}
+        {% endblock footer %}
+        <!-- FIN DEL FOOTER-->
+
+        <!-- INICIO DEL JS-->
+        {% block js %}
+        {% endblock js %}
+        <!-- FIN DEL JS--> 
+    </div>
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

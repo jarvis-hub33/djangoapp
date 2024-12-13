@@ -1,0 +1,48 @@
+/* Estilo global para asegurar que no haya márgenes/paddings */
+html, body {
+    margin: 0; /* Quita márgenes */
+    padding: 0; /* Quita paddings */
+    height: 100%; /* Asegura que ocupen toda la pantalla */
+}
+
+/* Contenedor del fondo del login */
+.login-container {
+    min-height: 100vh; /* Ocupa toda la altura del viewport */
+    display: flex;
+    align-items: center; /* Centra verticalmente */
+    justify-content: center; /* Centra horizontalmente */
+    background: linear-gradient(to bottom, #004aad, #00b7ff); /* Fondo azul y celeste */
+}
+
+/* Opcional: Estilo del formulario */
+.login-card {
+    width: 350px;
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.login-card h2 {
+    text-align: center;
+    color: #004aad;
+    font-weight: bold;
+}
+
+.login-card .form-group {
+    margin-bottom: 15px;
+}
+
+.login-card button {
+    background: #004aad;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.login-card button:hover {
+    background: #00337f;
+}

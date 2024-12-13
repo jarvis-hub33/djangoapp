@@ -1,0 +1,47 @@
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Nombre</th>
+            <th>RUN</th>
+            <th>Enfermedad</th>
+            <th>Fecha de Nacimiento</th>
+            <th>Tipo de Atención</th>
+            <th>Especialidad</th>
+            <th>Foto</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for paciente in pacientes %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ paciente.nombre }} {{ paciente.paterno }} {{ paciente.materno }}</td>
+            <td>{{ paciente.run }}</td>
+            <td>{{ paciente.enfermedad }}</td>
+            <td>{{ paciente.fechaNac }}</td>
+            <td>{{ paciente.tipoatencion }}</td>
+            <td>{{ paciente.especialidad }}</td>
+            <td>
+                {% if paciente.foto %}
+                    <img src="{{ paciente.foto.url }}" alt="Foto del paciente" class="img-thumbnail" width="50" height="auto">
+                {% else %}
+                    <span class="text-muted">No disponible</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if user.is_authenticated %}
+                    {% if user.is_superuser %}
+                        <a class="btn btn-warning btn-sm" href="{% url 'pacienteEditar' paciente.id %}"><i class="bi bi-pencil-square"></i> Editar</a>
+                        <a class="btn btn-danger btn-sm" href="{% url 'pacienteDel' paciente.id %}"><i class="bi bi-trash3-fill"></i> Eliminar</a>
+                    {% endif %}
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="9" class="text-center">No se encontraron pacientes</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

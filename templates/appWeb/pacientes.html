@@ -1,0 +1,263 @@
+{% extends "appWeb/base.html" %}
+
+{% block contenido %}
+<div class="row mb-3 align-items-center">
+    <!-- Botón de agregar paciente -->
+    <div class="col-md-4">
+        <a class="btn btn-primary btn-lg" href="{% url 'paciente' %}">
+            <i class="bi bi-person-plus"></i> Agregar Paciente
+        </a>
+    </div>
+
+    <!-- Módulo de búsqueda por Ajax -->
+    <div class="col-lg-5">
+        <form id="searchForm" class="d-flex" method="GET" action="{% url 'buscar_pacientes' %}">
+            <input id="searchInput" class="form-control me-2" type="search" name="q" placeholder="Ingrese el nombre del paciente" aria-label="Search">
+            <button class="btn btn-outline-info" type="submit">Buscar</button>
+        </form>
+    </div>
+
+    <!-- Botones de acciones principales alineados a la derecha -->
+    <div class="col-md-3 text-end">
+        <div class="btn-group">
+            <button class="btn btn-warning btn-lg" id="editarSeleccionados">
+                <i class="bi bi-pencil-square"></i> Editar
+            </button>
+            <button class="btn btn-danger btn-lg" id="eliminarSeleccionados">
+                <i class="bi bi-trash-fill"></i> Eliminar
+            </button>
+            <button class="btn btn-primary btn-lg" id="informeSeleccionados">
+                <i class="bi bi-file-earmark-text"></i> Informe
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <form id="formAcciones" method="POST">
+            {% csrf_token %}
+            <table class="table table-striped mt-4">
+                <thead>
+                    <tr>
+                        <th>
+                            <input type="checkbox" id="selectAll">
+                        </th>
+                        <th>RUN</th>
+                        <th>Nombre</th>
+                        <th>Apellido Paterno</th>
+                        <th>Apellido Materno</th>
+                        <th>Sexo</th>
+                        <th>Enfermedad</th>
+                        <th>Fecha Nac</th>
+                        <th>Tipo de Atención</th>
+                        <th>Especialidad</th>
+                        <th>Fotografía</th>
+                    </tr>
+                </thead>
+                <tbody id="pacientesBody">
+                    {% for paciente in pacientes %}
+                    <tr>
+                        <td>
+                            <input type="checkbox" class="pacienteCheckbox" name="pacientesSeleccionados" value="{{ paciente.id }}">
+                        </td>
+                        <td>{{ paciente.run }}</td>
+                        <td>{{ paciente.nombre }}</td>
+                        <td>{{ paciente.paterno }}</td>
+                        <td>{{ paciente.materno }}</td>
+                        <td>{{ paciente.sexo }}</td>
+                        <td>{{ paciente.enfermedad }}</td>
+                        <td>{{ paciente.fechaNac }}</td>
+                        <td>{{ paciente.tipoatencion }}</td>
+                        <td>{{ paciente.especialidad }}</td>
+                        <td>
+                            {% if paciente.foto %}
+                            <img src="{{ paciente.foto.url }}" alt="foto del paciente" width="50" height="50">
+                            {% else %}
+                            Sin Foto
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="text-center">
+                <button class="btn btn-primary" id="prevPage" disabled>⮜ Anterior</button>
+                <button class="btn btn-primary" id="nextPage">Siguiente ⮞</button>
+                <div class="mt-3" id="pageNumber">Página 1</div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Estilos adicionales -->
+<style>
+    .btn-lg {
+        font-size: 16px;
+        padding: 5px 12px;
+    }
+
+    .row.mb-3 {
+        align-items: center;
+    }
+
+    #searchInput {
+        font-size: 16px;
+    }
+
+    .btn-group .btn {
+        margin-right: 8px;
+    }
+
+    .table th:first-child,
+    .table td:first-child {
+        text-align: center;
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
+
+    #pageNumber {
+        font-weight: bold;
+        font-size: 18px;
+    }
+</style>
+
+<!-- JavaScript -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const selectAllCheckbox = document.getElementById("selectAll");
+        const pacienteCheckboxes = document.querySelectorAll(".pacienteCheckbox");
+
+        // Seleccionar o deseleccionar todos los checkboxes
+        selectAllCheckbox.addEventListener("change", function () {
+            pacienteCheckboxes.forEach((checkbox) => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+        });
+
+        document.getElementById("editarSeleccionados").addEventListener("click", function () {
+            const seleccionados = getSeleccionados();
+            if (seleccionados.length === 1) {
+                const id = seleccionados[0];
+                const editarUrl = "{% url 'pacienteEditar' 0 %}".replace('0', id);
+                window.location.href = editarUrl;
+            } else if (seleccionados.length > 1) {
+                alert("Solo puedes editar un paciente a la vez.");
+            } else {
+                alert("Por favor selecciona un paciente para editar.");
+            }
+        });
+
+        document.getElementById("eliminarSeleccionados").addEventListener("click", function () {
+            const seleccionados = getSeleccionados();
+            if (seleccionados.length > 0) {
+                const ids = seleccionados.join(",");
+                const eliminarUrl = "{% url 'pacienteDel' 0 %}".replace('0', ids);
+                if (confirm("¿Estás seguro de que deseas eliminar los pacientes seleccionados?")) {
+                    window.location.href = eliminarUrl;
+                }
+            } else {
+                alert("Por favor selecciona al menos un paciente para eliminar.");
+            }
+        });
+
+        document.getElementById("informeSeleccionados").addEventListener("click", function () {
+            const seleccionados = getSeleccionados();
+            if (seleccionados.length === 1) {
+                const id = seleccionados[0];
+                const informeUrl = "{% url 'informe_paciente' 0 %}".replace('0', id);
+                window.location.href = informeUrl;
+            } else if (seleccionados.length > 1) {
+                alert("Solo puedes ver el informe de un paciente a la vez.");
+            } else {
+                alert("Por favor selecciona un paciente para ver el informe.");
+            }
+        });
+
+        function getSeleccionados() {
+            return Array.from(pacienteCheckboxes)
+                .filter((checkbox) => checkbox.checked)
+                .map((checkbox) => checkbox.value);
+        }
+
+        const pacientesBody = document.getElementById("pacientesBody");
+        const prevPageBtn = document.getElementById("prevPage");
+        const nextPageBtn = document.getElementById("nextPage");
+        const pageNumberElement = document.getElementById("pageNumber");
+
+        let currentPage = 1;
+        const pageSize = 10;
+        const pacientes = Array.from(pacientesBody.querySelectorAll("tr"));
+
+        function renderPage(page) {
+            const startIndex = (page - 1) * pageSize;
+            const endIndex = startIndex + pageSize;
+
+            pacientes.forEach((paciente, index) => {
+                if (index >= startIndex && index < endIndex) {
+                    paciente.style.display = "";
+                } else {
+                    paciente.style.display = "none";
+                }
+            });
+
+            prevPageBtn.disabled = page === 1;
+            nextPageBtn.disabled = endIndex >= pacientes.length;
+            pageNumberElement.textContent = `Página ${page}`;
+        }
+
+        prevPageBtn.addEventListener("click", function () {
+            if (currentPage > 1) {
+                currentPage--;
+                renderPage(currentPage);
+            }
+        });
+
+        nextPageBtn.addEventListener("click", function () {
+            if (currentPage * pageSize < pacientes.length) {
+                currentPage++;
+                renderPage(currentPage);
+            }
+        });
+
+        renderPage(currentPage);
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('#searchForm').submit(function(event) {
+            event.preventDefault();
+            var query = $('#searchInput').val();
+            $.ajax({
+                url: "{% url 'buscar_pacientes' %}",
+                type: "GET",
+                data: { q: query },
+                success: function(response) {
+                    $('#pacientesContainer').html(response);
+                },
+                error: function() {
+                    alert("Error al buscar pacientes.");
+                }
+            });
+        });
+
+        $('#searchInput').on('input', function() {
+            var query = $(this).val();
+            $.ajax({
+                url: "{% url 'buscar_pacientes' %}",
+                type: "GET",
+                data: { q: query },
+                success: function(response) {
+                    $('#pacientesContainer').html(response);
+                },
+                error: function() {
+                    alert("Error al buscar pacientes.");
+                }
+            });
+        });
+    });
+</script>
+{% endblock contenido %}

@@ -1,0 +1,12 @@
+.nav-bar {
+    background-color: #26a4ff; /* Azul */
+    color: white;              /* Texto blanco */
+    padding: 10px;             /* Espaciado alrededor del texto */
+    text-align: center;        /* Centrar el texto */
+    border-radius: 5px;        /* Esquinas redondeadas (opcional) */
+}
+
+.nav-bar h2 {
+    margin: 0; /* Elimina cualquier margen predeterminado */
+    color: white; /* Asegúrate de que el texto sea blanco */
+}

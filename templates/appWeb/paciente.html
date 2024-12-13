@@ -1,0 +1,101 @@
+{% extends "appWeb/base.html" %}
+{% load static %}
+
+{% block contenido %}
+<div class="container py-4">
+    <h2 class="text-primary text-center mb-4">Añadir Paciente</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row">
+            <!-- Primera columna -->
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form.run.label_tag }}
+                        {{ form.run }}
+                        {{ form.run.errors }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form.nombre.label_tag }}
+                        {{ form.nombre }}
+                        {{ form.nombre.errors }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form.paterno.label_tag }}
+                        {{ form.paterno }}
+                        {{ form.paterno.errors }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form.materno.label_tag }}
+                        {{ form.materno }}
+                        {{ form.materno.errors }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form.sexo.label_tag }}
+                        {{ form.sexo }}
+                        {{ form.sexo.errors }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form.enfermedad.label_tag }}
+                        {{ form.enfermedad }}
+                        {{ form.enfermedad.errors }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form.fechaNac.label_tag }}
+                        {{ form.fechaNac }}
+                        {{ form.fechaNac.errors }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form.tipoatencion.label_tag }}
+                        {{ form.tipoatencion }}
+                        {{ form.tipoatencion.errors }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form.especialidad.label_tag }}
+                        {{ form.especialidad }}
+                        {{ form.especialidad.errors }}
+                    </div>
+                </div>
+            </div>
+            <!-- Columna de fotografía -->
+            <div class="col-md-4 text-center">
+                <img id="preview" src="{% static 'images/paciente.png' %}" alt="Sin fotografía" class="img-fluid rounded mb-3" style="max-width: 200px;">
+                <p class="mb-3">Fotografía</p>
+                {{ form.foto.label_tag }}
+                {{ form.foto }}
+                {{ form.foto.errors }}
+            </div>
+        </div>
+        <!-- Botones -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <a class="btn btn-primary btn-block" href="{% url 'pacientes' %}">Volver a Lista</a>
+            </div>
+            <div class="col-md-6">
+                <button class="btn btn-success btn-block" type="submit">Guardar</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Script para vista previa -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const fotoInput = document.querySelector('input[name="foto"]');
+        const preview = document.getElementById('preview');
+        
+        fotoInput.addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = "{% static 'images/paciente.png' %}";
+            }
+        });
+    });
+</script>
+{% endblock contenido %}

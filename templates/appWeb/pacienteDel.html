@@ -1,0 +1,31 @@
+{% extends "appWeb/base.html" %}
+{% load static %}
+
+{% block contenido %}
+
+<div class="rol">
+    <div class="col">
+        <h2>Confirmar Eliminacion de Paciente</h2>
+        <div class="alert alert-danger">
+            ¿Esta seguro de eliminar al paciente {{paciente.nombre}} {{paciente.paterno}} {{paciente.materno}}?
+        </div>
+        <form method="post">
+            {%csrf_token%}
+            <div class="row">
+                <div class="col">
+                    <a class="btn btn-dark" href="{% url 'pacientes' %}">Cancelar</a>
+                </div>
+                <div class="col">
+                    <button class="btn btn-danger" type="submit">Confirmar Eliminar</button>   
+                </div>
+            </div> 
+        </form>
+    </div>
+</div>
+
+
+
+
+
+
+{% endblock contenido %}
